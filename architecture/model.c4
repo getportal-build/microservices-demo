@@ -19,16 +19,6 @@ model {
         otel_service 'cartservice'
         resource 'cartservice'
       }
-      cartstore = component 'cartstore' {
-        metadata {
-          code 'src/cartservice/src/cartstore/**'
-        }
-      }
-      services = component 'services' {
-        metadata {
-          code 'src/cartservice/src/services/**'
-        }
-      }
     }
     redis_cart = datastore 'redis-cart' {  // helm-chart/templates/cartservice.yaml:100
       technology 'redis:alpine@sha256:8096655e437712b07503796fb64d81359256cfcff0ab29d95a7da72863786efb, or Memorystore for Redis'
@@ -42,16 +32,6 @@ model {
         code 'src/checkoutservice/**'
         otel_service 'checkoutservice'
         resource 'checkoutservice'
-      }
-      genproto = component 'genproto' {
-        metadata {
-          code 'src/checkoutservice/genproto/**'
-        }
-      }
-      money = component 'money' {
-        metadata {
-          code 'src/checkoutservice/money/**'
-        }
       }
     }
     currencyservice = service 'currencyservice' {  // helm-chart/templates/currencyservice.yaml:23
@@ -76,21 +56,6 @@ model {
         code 'src/frontend/**'
         otel_service 'frontend'
         resource 'frontend'
-      }
-      genproto_2 = component 'genproto' {
-        metadata {
-          code 'src/frontend/genproto/**'
-        }
-      }
-      money_2 = component 'money' {
-        metadata {
-          code 'src/frontend/money/**'
-        }
-      }
-      validator = component 'validator' {
-        metadata {
-          code 'src/frontend/validator/**'
-        }
       }
     }
     loadgenerator = service 'loadgenerator' {  // helm-chart/templates/loadgenerator.yaml:23
@@ -185,8 +150,6 @@ model {
   recommendationservice -[request]-> productcatalogservice  // env.PRODUCT_CATALOG_SERVICE_ADDR
   cartservice -> Spanner  // reads or writes? say which: -[reads]-> or -[writes]->
   cartservice -> PostgreSQL  // reads or writes? say which: -[reads]-> or -[writes]->
-  money -> genproto
-  money_2 -> genproto_2
   productcatalogservice -> PostgreSQL  // reads or writes? say which: -[reads]-> or -[writes]->
 }
 
