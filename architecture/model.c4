@@ -1,0 +1,168 @@
+// Starter spec, read from the code and traces by portal (no AI).
+// It says what exists. Add what the code can't: domains, your names,
+// rules, and what you plan to build.
+// Conventions: https://portal.haris-d21.workers.dev/skills/portal-architecture/SKILL.md
+model {
+  system = domain 'microservices-demo' {
+    adservice = service 'adservice' {  // helm-chart/templates/adservice.yaml:23
+      technology 'Java · gRPC'
+      metadata {
+        code 'src/adservice/**'
+        otel_service 'adservice'
+        resource 'adservice'
+      }
+    }
+    cartservice = service 'cartservice' {  // helm-chart/templates/cartservice.yaml:23
+      technology 'C# · gRPC · REST'
+      metadata {
+        code 'src/cartservice/src/**'
+        otel_service 'cartservice'
+        resource 'cartservice'
+      }
+    }
+    redis_cart = datastore 'redis-cart' {  // helm-chart/templates/cartservice.yaml:100
+      technology 'redis:alpine@sha256:2afba59292f25f5d1af200496db41bea2c6c816b059f57ae74703a50a03a27d0, or Memorystore for Redis'
+      metadata {
+        resource 'redis-cart'
+      }
+    }
+    checkoutservice = service 'checkoutservice' {  // helm-chart/templates/checkoutservice.yaml:23
+      technology 'Go · gRPC'
+      metadata {
+        code 'src/checkoutservice/**'
+        otel_service 'checkoutservice'
+        resource 'checkoutservice'
+      }
+    }
+    currencyservice = service 'currencyservice' {  // helm-chart/templates/currencyservice.yaml:23
+      technology 'JavaScript · gRPC'
+      metadata {
+        code 'src/currencyservice/**'
+        otel_service 'currencyservice'
+        resource 'currencyservice'
+      }
+    }
+    emailservice = service 'emailservice' {  // helm-chart/templates/emailservice.yaml:23
+      technology 'Python · gRPC'
+      metadata {
+        code 'src/emailservice/**'
+        otel_service 'emailservice'
+        resource 'emailservice'
+      }
+    }
+    frontend = service 'frontend' {  // helm-chart/templates/frontend.yaml:23
+      technology 'Go · gorilla/mux'
+      metadata {
+        code 'src/frontend/**'
+        otel_service 'frontend'
+        resource 'frontend'
+      }
+    }
+    loadgenerator = service 'loadgenerator' {  // helm-chart/templates/loadgenerator.yaml:23
+      technology 'Python'
+      metadata {
+        code 'src/loadgenerator/**'
+        otel_service 'loadgenerator'
+        resource 'loadgenerator'
+      }
+    }
+    paymentservice = service 'paymentservice' {  // helm-chart/templates/paymentservice.yaml:23
+      technology 'JavaScript · gRPC'
+      metadata {
+        code 'src/paymentservice/**'
+        otel_service 'paymentservice'
+        resource 'paymentservice'
+      }
+    }
+    productcatalogservice = service 'productcatalogservice' {  // helm-chart/templates/productcatalogservice.yaml:23
+      technology 'Go · gRPC'
+      metadata {
+        code 'src/productcatalogservice/**'
+        otel_service 'productcatalogservice'
+        resource 'productcatalogservice'
+      }
+    }
+    recommendationservice = service 'recommendationservice' {  // helm-chart/templates/recommendationservice.yaml:23
+      technology 'Python · gRPC'
+      metadata {
+        code 'src/recommendationservice/**'
+        otel_service 'recommendationservice'
+        resource 'recommendationservice'
+      }
+    }
+    shippingservice = service 'shippingservice' {  // helm-chart/templates/shippingservice.yaml:23
+      technology 'Go · gRPC'
+      metadata {
+        code 'src/shippingservice/**'
+        otel_service 'shippingservice'
+        resource 'shippingservice'
+      }
+    }
+    my_cluster = infra 'my_cluster' {  // terraform/main.tf:40
+      technology 'GKE'
+      metadata {
+        resource 'my_cluster'
+      }
+    }
+    Spanner = datastore 'Spanner' {  // src/cartservice/src/cartservice.csproj:11
+      technology 'Spanner'
+      metadata {
+        resource 'Spanner'
+      }
+    }
+    PostgreSQL = datastore 'PostgreSQL' {  // src/cartservice/src/cartservice.csproj:12
+      technology 'PostgreSQL'
+      metadata {
+        resource 'PostgreSQL'
+      }
+    }
+    OpenTelemetry = infra 'OpenTelemetry' {  // src/checkoutservice/go.mod:13
+      technology 'OpenTelemetry'
+      metadata {
+        resource 'OpenTelemetry'
+      }
+    }
+    shoppingassistantservice = service 'shoppingassistantservice' {  // src/shoppingassistantservice/requirements.in:1
+      technology 'Python · Flask · REST'
+      metadata {
+        code 'src/shoppingassistantservice/**'
+        otel_service 'shoppingassistantservice'
+        resource 'shoppingassistantservice'
+      }
+    }
+  }
+
+  cartservice -> redis_cart  // reads or writes? say which: -[reads]-> or -[writes]->
+  checkoutservice -[request]-> productcatalogservice  // env.PRODUCT_CATALOG_SERVICE_ADDR
+  checkoutservice -[request]-> shippingservice  // env.SHIPPING_SERVICE_ADDR
+  checkoutservice -[request]-> paymentservice  // env.PAYMENT_SERVICE_ADDR
+  checkoutservice -[request]-> emailservice  // env.EMAIL_SERVICE_ADDR
+  checkoutservice -[request]-> currencyservice  // env.CURRENCY_SERVICE_ADDR
+  checkoutservice -[request]-> cartservice  // env.CART_SERVICE_ADDR
+  frontend -[request]-> productcatalogservice  // env.PRODUCT_CATALOG_SERVICE_ADDR
+  frontend -[request]-> currencyservice  // env.CURRENCY_SERVICE_ADDR
+  frontend -[request]-> cartservice  // env.CART_SERVICE_ADDR
+  frontend -[request]-> recommendationservice  // env.RECOMMENDATION_SERVICE_ADDR
+  frontend -[request]-> shippingservice  // env.SHIPPING_SERVICE_ADDR
+  frontend -[request]-> checkoutservice  // env.CHECKOUT_SERVICE_ADDR
+  frontend -[request]-> adservice  // env.AD_SERVICE_ADDR
+  loadgenerator -[request]-> frontend  // env.FRONTEND_ADDR
+  recommendationservice -[request]-> productcatalogservice  // env.PRODUCT_CATALOG_SERVICE_ADDR
+  cartservice -> Spanner  // reads or writes? say which: -[reads]-> or -[writes]->
+  cartservice -> PostgreSQL  // reads or writes? say which: -[reads]-> or -[writes]->
+  productcatalogservice -> PostgreSQL  // reads or writes? say which: -[reads]-> or -[writes]->
+}
+
+specification {
+  element domain
+  element service
+  element event
+  element datastore
+  element infra
+  element component
+  relationship request
+  relationship publishes
+  relationship consumes
+  relationship reads
+  relationship writes
+}
