@@ -31,7 +31,7 @@ model {
       }
     }
     redis_cart = datastore 'redis-cart' {  // helm-chart/templates/cartservice.yaml:100
-      technology 'redis:alpine@sha256:8096655e437712b07503796fb64d81359256cfcff0ab29d95a7da72863786efb'
+      technology 'redis:alpine@sha256:8096655e437712b07503796fb64d81359256cfcff0ab29d95a7da72863786efb, or Memorystore for Redis'
       metadata {
         resource 'redis-cart'
       }
@@ -133,22 +133,10 @@ model {
         resource 'shippingservice'
       }
     }
-    prs_gke_cluster = infra 'prs-gke-cluster' {  // .github/terraform/main.tf:98
-      technology 'GKE · us-central1'
-      metadata {
-        resource 'prs-gke-cluster'
-      }
-    }
     my_cluster = infra 'my_cluster' {  // terraform/main.tf:40
-      technology 'GKE · us-central1'
+      technology 'GKE'
       metadata {
         resource 'my_cluster'
-      }
-    }
-    redis_cart_2 = datastore 'redis-cart' {  // terraform/memorystore.tf:16
-      technology 'Memorystore for Redis · us-central1'
-      metadata {
-        resource 'redis-cart'
       }
     }
     Spanner = datastore 'Spanner' {  // src/cartservice/src/cartservice.csproj:11
